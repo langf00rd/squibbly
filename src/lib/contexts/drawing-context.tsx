@@ -1,33 +1,14 @@
 "use client";
 
 import type React from "react";
-import { createContext, useContext, useState, useCallback } from "react";
-
-type Stroke = {
-  path: { x: number; y: number }[];
-  color: string;
-  brushSize: number;
-  tool: "pencil" | "eraser";
-};
-
-interface DrawingContextType {
-  color: string;
-  setColor: (color: string) => void;
-  brushSize: number;
-  setBrushSize: (size: number) => void;
-  tool: "pencil" | "eraser";
-  setTool: (tool: "pencil" | "eraser") => void;
-  currentDrawing: Stroke[];
-  setCurrentDrawing: React.Dispatch<React.SetStateAction<Stroke[]>>;
-  savedDrawings: Stroke[][];
-  addSavedDrawing: (drawing: Stroke[]) => void;
-  undoStack: Stroke[][];
-  redoStack: Stroke[][];
-  addStroke: (stroke: Stroke) => void;
-  undo: () => void;
-  redo: () => void;
-  loadDrawing: (index: number) => void;
-}
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { Drawing, DrawingContextType, Stroke } from "../generics";
 
 const DrawingContext = createContext<DrawingContextType | undefined>(undefined);
 
@@ -35,10 +16,10 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [color, setColor] = useState("#000000");
-  const [brushSize, setBrushSize] = useState(5);
+  const [brushSize, setBrushSize] = useState(8);
   const [tool, setTool] = useState<"pencil" | "eraser">("pencil");
   const [currentDrawing, setCurrentDrawing] = useState<Stroke[]>([]);
-  const [savedDrawings, setSavedDrawings] = useState<Stroke[][]>([]);
+  const [savedDrawings, setSavedDrawings] = useState<Drawing[]>([]);
   const [undoStack, setUndoStack] = useState<Stroke[][]>([]);
   const [redoStack, setRedoStack] = useState<Stroke[][]>([]);
 
@@ -69,19 +50,49 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [currentDrawing, redoStack]);
 
-  const addSavedDrawing = useCallback((drawing: Stroke[]) => {
-    setSavedDrawings((prev) => [...prev, drawing]);
-  }, []);
+  const addSavedDrawing = useCallback(
+    (drawing: Stroke[]) => {
+      setSavedDrawings((prev) => [
+        ...prev,
+        {
+          created: Date.now(),
+          title: `squibble #${prev.length + 1}`,
+          data: drawing,
+        },
+      ]);
+      localStorage.setItem("drawings:saved", JSON.stringify(savedDrawings)); // save to local storage
+    },
+    [savedDrawings],
+  );
 
   const loadDrawing = useCallback(
     (index: number) => {
       const drawingToLoad = savedDrawings[index];
-      setCurrentDrawing(drawingToLoad);
+      console.log("loading", index);
+      console.log("loading:drawing", drawingToLoad);
+      setCurrentDrawing(drawingToLoad.data);
       setUndoStack([]);
       setRedoStack([]);
     },
     [savedDrawings],
   );
+
+  function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
+  useEffect(() => {
+    // fetch saved drawing from local storage and set to state
+    const storedDrawings = localStorage.getItem("drawings:saved");
+    if (storedDrawings) {
+      setSavedDrawings(JSON.parse(storedDrawings));
+    }
+  }, []);
 
   return (
     <DrawingContext.Provider
@@ -102,6 +113,7 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({
         undo,
         redo,
         loadDrawing,
+        toggleFullScreen,
       }}
     >
       {children}
