@@ -25,7 +25,7 @@ export default function SavedDrawingsButton() {
           <MenuIcon />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="m-3">
+      <PopoverContent className="m-3 max-h-[500px] overflow-scroll">
         <div>
           <p>Your saved drawings</p>
           <ul className="space-y-3">
