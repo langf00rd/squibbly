@@ -13,7 +13,6 @@ export default function ToolSelector() {
         title="Pencil"
         size="icon"
         className={`text-black border border-gray-100 bg-white shadow-xl ${tool === "pencil" && "bg-primary text-primary-foreground border-transparent"}`}
-        style={{ backgroundColor: tool === "pencil" ? "black" : "white" }}
         onClick={() => setTool("pencil")}
       >
         <Pencil size={20} />

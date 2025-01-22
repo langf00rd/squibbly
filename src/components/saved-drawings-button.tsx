@@ -11,32 +11,36 @@ import type React from "react";
 import { Button } from "./ui/button";
 
 export default function SavedDrawingsButton() {
-  const { currentDrawing, addSavedDrawing, savedDrawings, loadDrawing } =
+  const { savedDrawings, loadDrawing, currentDrawingDetails } =
     useDrawingContext();
-
-  const handleSave = () => {
-    addSavedDrawing(currentDrawing);
-  };
-
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button onClick={handleSave} size="icon" variant="secondary">
+        <Button size="icon" variant="secondary">
           <MenuIcon />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="m-3 max-h-[500px] overflow-scroll">
-        <div>
-          <p>Your saved drawings</p>
+        <div className="space-y-3">
+          <p className="font-semibold">Your saved drawings</p>
           <ul className="space-y-3">
-            {savedDrawings.map((drawing, index) => (
+            {savedDrawings.map((drawing) => (
               <li
                 key={drawing.created}
                 className="flex items-center gap-1"
                 role="button"
-                onClick={() => loadDrawing(index)}
+                onClick={() => loadDrawing(drawing.id)}
               >
-                <p>{drawing.title}</p>
+                <p
+                  style={{
+                    color:
+                      currentDrawingDetails?.id === drawing.id
+                        ? "var(--primary)"
+                        : "",
+                  }}
+                >
+                  {drawing.title}
+                </p>
               </li>
             ))}
           </ul>

@@ -1,19 +1,16 @@
 "use client";
 
-import type React from "react";
 import { Undo2, Redo2 } from "lucide-react";
 import { useDrawingContext } from "@/lib/contexts/drawing-context";
 import { Button } from "./ui/button";
 
-const colors = ["#000000", "#FF0000", "#00FF00", "#0000FF"];
+// const colors = ["#000000", "#FF0000", "#00FF00", "#0000FF"];
 
-const Toolbar: React.FC = () => {
-  const { color, setColor, brushSize, setBrushSize, undo, redo } =
-    useDrawingContext();
-
+export default function Toolbar() {
+  const { undo, redo } = useDrawingContext();
   return (
     <div className="flex items-center space-x-4">
-      <div className="flex space-x-1">
+      {/* <div className="flex space-x-1">
         {colors.map((c) => (
           <button
             key={c}
@@ -22,15 +19,15 @@ const Toolbar: React.FC = () => {
             onClick={() => setColor(c)}
           />
         ))}
-      </div>
-      <input
+      </div> */}
+      {/* <input
         type="range"
         min="1"
         max="20"
         value={brushSize}
         onChange={(e) => setBrushSize(Number(e.target.value))}
         className="w-32"
-      />
+      /> */}
       <div className="flex space-x-2">
         <Button
           size="icon"
@@ -49,6 +46,4 @@ const Toolbar: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default Toolbar;
+}

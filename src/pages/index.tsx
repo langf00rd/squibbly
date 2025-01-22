@@ -1,4 +1,5 @@
 import DrawingCanvas from "@/components/canvas";
+import DrawingNameInput from "@/components/drawing-name-input";
 import SaveButton from "@/components/save-button";
 import SavedDrawingsButton from "@/components/saved-drawings-button";
 import ToolSelector from "@/components/tool-selector";
@@ -16,12 +17,19 @@ export default function Home() {
       className={`h-screen w-screen overflow-hidden ${geistMono.className}`}
     >
       <DrawingCanvas />
-      <div className="absolute p-3 top-0 left-0 right-0 flex justify-between items-center">
-        <ToolSelector />
-        <Toolbar />
+      <div className="absolute p-3 flex top-0 left-0 right-0 justify-between items-center">
+        <DrawingNameInput />
         <div className="flex gap-3">
           <SaveButton />
           <SavedDrawingsButton />
+        </div>
+      </div>
+      <div className="absolute p-3 flex bottom-0 left-0 right-0 justify-between items-center">
+        <div className="flex gap-3">
+          <ToolSelector />
+        </div>
+        <div className="flex gap-3">
+          <Toolbar />
         </div>
       </div>
     </main>

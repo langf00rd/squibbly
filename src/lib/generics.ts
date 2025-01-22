@@ -6,6 +6,7 @@ export type Stroke = {
 };
 
 export interface Drawing {
+  id: string;
   data: Stroke[];
   created: number;
   title?: string;
@@ -28,5 +29,6 @@ export interface DrawingContextType {
   addStroke: (stroke: Stroke) => void;
   undo: () => void;
   redo: () => void;
-  loadDrawing: (index: number) => void;
+  loadDrawing: (index: Drawing["id"]) => void;
+  currentDrawingDetails: Drawing | null;
 }

@@ -19,6 +19,8 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({
   const [brushSize, setBrushSize] = useState(8);
   const [tool, setTool] = useState<"pencil" | "eraser">("pencil");
   const [currentDrawing, setCurrentDrawing] = useState<Stroke[]>([]);
+  const [currentDrawingDetails, setCurrentDrawingDetails] =
+    useState<Drawing | null>(null);
   const [savedDrawings, setSavedDrawings] = useState<Drawing[]>([]);
   const [undoStack, setUndoStack] = useState<Stroke[][]>([]);
   const [redoStack, setRedoStack] = useState<Stroke[][]>([]);
@@ -58,6 +60,7 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({
           created: Date.now(),
           title: `squibble #${prev.length + 1}`,
           data: drawing,
+          id: `drawing-${prev.length + 1}`,
         },
       ]);
       localStorage.setItem("drawings:saved", JSON.stringify(savedDrawings)); // save to local storage
@@ -66,11 +69,15 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const loadDrawing = useCallback(
-    (index: number) => {
-      const drawingToLoad = savedDrawings[index];
-      console.log("loading", index);
+    (id: string) => {
+      const drawingToLoad = savedDrawings.find((a) => a.id === id);
+
+      console.log("loading", id);
       console.log("loading:drawing", drawingToLoad);
+
+      if (!drawingToLoad) return;
       setCurrentDrawing(drawingToLoad.data);
+      setCurrentDrawingDetails(drawingToLoad);
       setUndoStack([]);
       setRedoStack([]);
     },
@@ -90,7 +97,14 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({
     // fetch saved drawing from local storage and set to state
     const storedDrawings = localStorage.getItem("drawings:saved");
     if (storedDrawings) {
-      setSavedDrawings(JSON.parse(storedDrawings));
+      const parsedStoredDrawings: Drawing[] = JSON.parse(storedDrawings);
+      setSavedDrawings(parsedStoredDrawings);
+      setCurrentDrawingDetails(
+        parsedStoredDrawings[parsedStoredDrawings.length - 1],
+      );
+      setCurrentDrawing(
+        parsedStoredDrawings[parsedStoredDrawings.length - 1].data,
+      );
     }
   }, []);
 
@@ -114,6 +128,7 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({
         redo,
         loadDrawing,
         toggleFullScreen,
+        currentDrawingDetails,
       }}
     >
       {children}
