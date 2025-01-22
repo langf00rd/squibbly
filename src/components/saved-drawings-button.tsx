@@ -6,7 +6,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useDrawingContext } from "@/lib/contexts/drawing-context";
-import { MenuIcon, Save } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 import type React from "react";
 import { Button } from "./ui/button";
 
