@@ -1,6 +1,5 @@
 import DrawingCanvas from "@/lib/components/canvas";
 import SaveButton from "@/lib/components/save-button";
-import SavedDrawings from "@/lib/components/saved-drawing";
 import ToolSelector from "@/lib/components/tool-selector";
 import Toolbar from "@/lib/components/toolbar";
 import { Geist_Mono } from "next/font/google";
