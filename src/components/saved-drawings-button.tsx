@@ -23,6 +23,9 @@ export default function SavedDrawingsButton() {
       <PopoverContent className="m-3 max-h-[500px] overflow-scroll">
         <div className="space-y-3">
           <p className="font-semibold">Your saved squibbles</p>
+          {savedDrawings.length < 1 && (
+            <p className="text-sm">No saved squibbles yet :(</p>
+          )}
           <ul className="space-y-3">
             {savedDrawings.map((drawing) => (
               <li

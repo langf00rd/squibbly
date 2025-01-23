@@ -8,7 +8,7 @@ export type Stroke = {
 export interface Drawing {
   id: string;
   data: Stroke[];
-  created: number;
+  created: string;
   title?: string;
 }
 
@@ -22,6 +22,9 @@ export interface DrawingContextType {
   setTool: (tool: "pencil" | "eraser") => void;
   currentDrawing: Stroke[];
   setCurrentDrawing: React.Dispatch<React.SetStateAction<Stroke[]>>;
+  setCurrentDrawingDetails: React.Dispatch<
+    React.SetStateAction<Drawing | null>
+  >;
   savedDrawings: Drawing[];
   addSavedDrawing: (drawing: Stroke[]) => void;
   undoStack: Stroke[][];
@@ -31,4 +34,7 @@ export interface DrawingContextType {
   redo: () => void;
   loadDrawing: (index: Drawing["id"]) => void;
   currentDrawingDetails: Drawing | null;
+  drawingTitle: string;
+  setDrawingTitle: React.Dispatch<React.SetStateAction<string>>;
+  createNewDrawing: () => void;
 }

@@ -1,5 +1,6 @@
 import DrawingCanvas from "@/components/canvas";
 import DrawingNameInput from "@/components/drawing-name-input";
+import NewButton from "@/components/new-button";
 import SaveButton from "@/components/save-button";
 import SavedDrawingsButton from "@/components/saved-drawings-button";
 import ToolSelector from "@/components/tool-selector";
@@ -20,6 +21,7 @@ export default function Home() {
       <div className="absolute p-3 flex top-0 left-0 right-0 justify-between items-center">
         <DrawingNameInput />
         <div className="flex gap-3">
+          <NewButton />
           <SaveButton />
           <SavedDrawingsButton />
         </div>

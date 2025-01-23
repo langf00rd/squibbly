@@ -7,13 +7,8 @@ import { Button } from "./ui/button";
 
 export default function SaveButton() {
   const { currentDrawing, addSavedDrawing } = useDrawingContext();
-
-  function handleSave() {
-    addSavedDrawing(currentDrawing);
-  }
-
   return (
-    <Button onClick={handleSave} variant="secondary">
+    <Button onClick={() => addSavedDrawing(currentDrawing)} variant="secondary">
       <Save size={20} />
       Save
     </Button>
