@@ -1,7 +1,7 @@
 {
   "name": "squibbly",
   "short_name": "squibbly",
-  "description": "A web-based drawing app optimized for iPad and Apple Pencil",
+  "description": "a web-based drawing app optimized for ipad and apple pencil",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
