@@ -9,9 +9,8 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Drawing, DrawingContextType, Stroke } from "../generics";
+import { COOKIE_KEYS, Drawing, DrawingContextType, Stroke } from "../generics";
 import { toast } from "../hooks/use-toast";
-
 const DrawingContext = createContext<DrawingContextType | undefined>(undefined);
 
 export function DrawingProvider(props: { children: ReactNode }) {
@@ -53,24 +52,21 @@ export function DrawingProvider(props: { children: ReactNode }) {
     }
   }, [currentDrawing, redoStack]);
 
-  console.log("squibles:saved:all", savedDrawings);
+  function saveToLocalStorage(key: COOKIE_KEYS, value: string) {
+    localStorage.setItem(key, value);
+  }
 
   const addSavedDrawing = useCallback(
     (drawing: Stroke[]) => {
       if (!currentDrawingDetails) {
-        // const newDrawing = {
-        //   id: `SQUIBBLE-${savedDrawings.length + 1}-${Date.now()}`,
-        //   title: '',
-        // }
         const newDrawing = {
           data: drawing,
           created: new Date().toISOString(),
           title: `squibble #1`,
           id: `SQUIBBLE-1-${Date.now()}`,
         };
-        console.log("saving new", newDrawing);
         setCurrentDrawingDetails(newDrawing);
-        localStorage.setItem("drawings:saved", JSON.stringify([newDrawing]));
+        saveToLocalStorage(COOKIE_KEYS.drawing, JSON.stringify([newDrawing]));
         return toast({
           title: "Great.",
           description: "Your first drawing is saved",
@@ -79,29 +75,25 @@ export function DrawingProvider(props: { children: ReactNode }) {
 
       const savedDrawingsIDs = savedDrawings.map((d) => d.id);
 
-      console.log("savedDrawingsIDs", savedDrawingsIDs);
-      console.log("currentDrawingDetails", currentDrawingDetails);
-
       if (savedDrawingsIDs.includes(currentDrawingDetails?.id)) {
-        console.log("drawing exists", currentDrawingDetails);
         const updatedDrawings = savedDrawings.map((d) =>
           d.id === currentDrawingDetails.id ? { ...d, data: drawing } : d,
         );
-        console.log("updatedDrawings", updatedDrawings);
         setSavedDrawings(updatedDrawings);
-        localStorage.setItem("drawings:saved", JSON.stringify(updatedDrawings)); // save to local storage
+        saveToLocalStorage(
+          COOKIE_KEYS.drawing,
+          JSON.stringify(updatedDrawings),
+        );
       } else {
-        console.log("drawing does not exist. create new");
         const thisDrawing = {
           ...currentDrawingDetails,
           data: drawing,
         };
-        console.log("new drawing object", thisDrawing);
         setSavedDrawings((prev) => [...prev, thisDrawing]);
-        localStorage.setItem(
-          "drawings:saved",
+        saveToLocalStorage(
+          COOKIE_KEYS.drawing,
           JSON.stringify([...savedDrawings, thisDrawing]),
-        ); // save to local storage
+        );
       }
       toast({
         title: "🎉 Awesome",
@@ -114,10 +106,6 @@ export function DrawingProvider(props: { children: ReactNode }) {
   const loadDrawing = useCallback(
     (id: string) => {
       const drawingToLoad = savedDrawings.find((a) => a.id === id);
-
-      console.log("loading", id);
-      console.log("loading:drawing", drawingToLoad);
-
       if (!drawingToLoad) return;
       setCurrentDrawing(drawingToLoad.data);
       setCurrentDrawingDetails(drawingToLoad);
@@ -138,7 +126,6 @@ export function DrawingProvider(props: { children: ReactNode }) {
   }
 
   function createDrawingObject(data?: Drawing) {
-    console.log("squibles:creating", data, savedDrawings.length);
     return {
       ...data,
       created: new Date().toISOString(),
@@ -154,28 +141,17 @@ export function DrawingProvider(props: { children: ReactNode }) {
     setCurrentDrawingDetails(newDrawing);
     setUndoStack([]);
     setRedoStack([]);
-    console.log(
-      "newDrawing",
-      newDrawing,
-      "currentDrawingDetails",
-      currentDrawingDetails,
-    );
   }
 
   useEffect(() => {
     // fetch saved drawing from local storage and set to state
-    const storedDrawings = localStorage.getItem("drawings:saved");
-    console.log("squibles:stored", storedDrawings);
+    const storedDrawings = localStorage.getItem(COOKIE_KEYS.drawing);
     if (storedDrawings) {
       const parsedStoredDrawings: Drawing[] = JSON.parse(storedDrawings);
       setSavedDrawings(parsedStoredDrawings);
-      console.log("squibles:stored:parsed", parsedStoredDrawings);
       setCurrentDrawingDetails(
         parsedStoredDrawings[parsedStoredDrawings.length - 1],
       );
-      // setDrawingTitle(
-      //   parsedStoredDrawings[parsedStoredDrawings.length - 1].title ?? "",
-      // );
       setCurrentDrawing(
         parsedStoredDrawings[parsedStoredDrawings.length - 1].data,
       );

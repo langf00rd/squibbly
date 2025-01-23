@@ -38,3 +38,7 @@ export interface DrawingContextType {
   setDrawingTitle: React.Dispatch<React.SetStateAction<string>>;
   createNewDrawing: () => void;
 }
+
+export enum COOKIE_KEYS {
+  drawing = "drawing:all",
+}
