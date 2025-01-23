@@ -22,7 +22,7 @@ export default function SavedDrawingsButton() {
       </PopoverTrigger>
       <PopoverContent className="m-3 max-h-[500px] overflow-scroll">
         <div className="space-y-3">
-          <p className="font-semibold">Your saved drawings</p>
+          <p className="font-semibold">Your saved squibbles</p>
           <ul className="space-y-3">
             {savedDrawings.map((drawing) => (
               <li

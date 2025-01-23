@@ -3,6 +3,7 @@
 import type React from "react";
 import {
   createContext,
+  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -12,11 +13,9 @@ import { Drawing, DrawingContextType, Stroke } from "../generics";
 
 const DrawingContext = createContext<DrawingContextType | undefined>(undefined);
 
-export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export function DrawingProvider(props: { children: ReactNode }) {
   const [color, setColor] = useState("#000000");
-  const [brushSize, setBrushSize] = useState(8);
+  const [brushSize, setBrushSize] = useState(5);
   const [tool, setTool] = useState<"pencil" | "eraser">("pencil");
   const [currentDrawing, setCurrentDrawing] = useState<Stroke[]>([]);
   const [currentDrawingDetails, setCurrentDrawingDetails] =
@@ -131,15 +130,15 @@ export const DrawingProvider: React.FC<{ children: React.ReactNode }> = ({
         currentDrawingDetails,
       }}
     >
-      {children}
+      {props.children}
     </DrawingContext.Provider>
   );
-};
+}
 
-export const useDrawingContext = () => {
+export function useDrawingContext() {
   const context = useContext(DrawingContext);
   if (context === undefined) {
     throw new Error("useDrawingContext must be used within a DrawingProvider");
   }
   return context;
-};
+}

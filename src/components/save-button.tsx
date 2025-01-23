@@ -5,12 +5,12 @@ import { Save } from "lucide-react";
 import { useDrawingContext } from "@/lib/contexts/drawing-context";
 import { Button } from "./ui/button";
 
-const SaveButton: React.FC = () => {
+export default function SaveButton() {
   const { currentDrawing, addSavedDrawing } = useDrawingContext();
 
-  const handleSave = () => {
+  function handleSave() {
     addSavedDrawing(currentDrawing);
-  };
+  }
 
   return (
     <Button onClick={handleSave} variant="secondary">
@@ -18,6 +18,4 @@ const SaveButton: React.FC = () => {
       Save
     </Button>
   );
-};
-
-export default SaveButton;
+}

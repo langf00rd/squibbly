@@ -2,13 +2,13 @@
 
 import { useDrawingContext } from "@/lib/contexts/drawing-context";
 import type React from "react";
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const CANVAS_WIDTH = 3000;
 const CANVAS_HEIGHT = 3000;
 const SCALE_FACTOR = 2;
 
-const DrawingCanvas: React.FC = () => {
+export default function DrawingCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { color, brushSize, tool, currentDrawing, addStroke } =
@@ -33,7 +33,7 @@ const DrawingCanvas: React.FC = () => {
     drawStrokes();
   }, [currentDrawing, offset]);
 
-  const drawStrokes = () => {
+  function drawStrokes() {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
@@ -56,18 +56,18 @@ const DrawingCanvas: React.FC = () => {
       });
       ctx.stroke();
     });
-  };
+  }
 
-  const startDrawing = (e: React.PointerEvent) => {
+  function startDrawing(evt: React.PointerEvent) {
     setIsDrawing(true);
-    const point = getPoint(e);
+    const point = getPoint(evt);
     currentStroke.current = [point];
-  };
+  }
 
-  const draw = (e: React.PointerEvent) => {
+  const draw = (evt: React.PointerEvent) => {
     if (!isDrawing) return;
 
-    const point = getPoint(e);
+    const point = getPoint(evt);
     currentStroke.current.push(point);
 
     const canvas = canvasRef.current;
@@ -101,30 +101,47 @@ const DrawingCanvas: React.FC = () => {
     }
   };
 
-  const getPoint = (e: React.PointerEvent) => {
+  function getPoint(evt: React.PointerEvent) {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
 
     const rect = canvas.getBoundingClientRect();
     return {
       x:
-        (e.clientX - rect.left) / ((rect.width / CANVAS_WIDTH) * SCALE_FACTOR) +
+        (evt.clientX - rect.left) /
+          ((rect.width / CANVAS_WIDTH) * SCALE_FACTOR) +
         offset.x,
       y:
-        (e.clientY - rect.top) /
+        (evt.clientY - rect.top) /
           ((rect.height / CANVAS_HEIGHT) * SCALE_FACTOR) +
         offset.y,
     };
-  };
+  }
 
-  const handleScroll = () => {
+  function handleScroll() {
     if (containerRef.current) {
       setOffset({
         x: containerRef.current.scrollLeft,
         y: containerRef.current.scrollTop,
       });
     }
-  };
+  }
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+
+    function handleTouchStart(evt: TouchEvent) {
+      evt.preventDefault();
+    }
+
+    canvas?.addEventListener("touchstart", handleTouchStart, {
+      passive: false,
+    });
+
+    return () => {
+      canvas?.removeEventListener("touchstart", handleTouchStart);
+    };
+  }, []);
 
   return (
     <div
@@ -153,6 +170,4 @@ const DrawingCanvas: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default DrawingCanvas;
+}

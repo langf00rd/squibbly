@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { useDrawingContext } from "@/lib/contexts/drawing-context";
 import { Eraser, Pencil } from "lucide-react";
-import type React from "react";
 
 export default function ToolSelector() {
   const { setTool, tool } = useDrawingContext();
@@ -25,9 +24,6 @@ export default function ToolSelector() {
       >
         <Eraser size={20} />
       </Button>
-      {/* <Button title="Eraser" size="icon" onClick={toggleFullScreen}>
-        <Fullscreen size={20} />
-      </Button> */}
     </div>
   );
 }
