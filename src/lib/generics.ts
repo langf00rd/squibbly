@@ -1,3 +1,9 @@
+export interface User {
+  id: number;
+  email: string;
+  created_at: string;
+}
+
 export type Stroke = {
   path: { x: number; y: number }[];
   color: string;
@@ -5,10 +11,10 @@ export type Stroke = {
   tool: "pencil" | "eraser";
 };
 
-export interface Drawing {
-  id: string;
+export interface Artifact {
+  id: number;
   data: Stroke[];
-  created: string;
+  created_at: string;
   title?: string;
 }
 
@@ -23,17 +29,17 @@ export interface DrawingContextType {
   currentDrawing: Stroke[];
   setCurrentDrawing: React.Dispatch<React.SetStateAction<Stroke[]>>;
   setCurrentDrawingDetails: React.Dispatch<
-    React.SetStateAction<Drawing | null>
+    React.SetStateAction<Artifact | null>
   >;
-  savedDrawings: Drawing[];
+  savedDrawings: Artifact[];
   addSavedDrawing: (drawing: Stroke[]) => void;
   undoStack: Stroke[][];
   redoStack: Stroke[][];
   addStroke: (stroke: Stroke) => void;
   undo: () => void;
   redo: () => void;
-  loadDrawing: (index: Drawing["id"]) => void;
-  currentDrawingDetails: Drawing | null;
+  loadDrawing: (index: Artifact["id"]) => void;
+  currentDrawingDetails: Artifact | null;
   drawingTitle: string;
   setDrawingTitle: React.Dispatch<React.SetStateAction<string>>;
   createNewDrawing: () => void;

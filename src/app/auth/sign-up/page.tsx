@@ -25,7 +25,12 @@ export default function SignUpPage() {
     const data = Object.fromEntries(form.entries());
     try {
       setIsLoading(true);
-      await signup(data.email as string, data.password as string);
+      await signup({
+        email: data.email as string,
+        password: data.password as string,
+        first_name: data.first_name as string,
+        last_name: data.last_name as string,
+      });
       window.location.href = ROUTES.app;
     } catch (err) {
       toast({
@@ -49,6 +54,16 @@ export default function SignUpPage() {
           </CardHeader>
           <CardContent>
             <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="flex gap-3">
+                <div>
+                  <Label htmlFor="first_name">First name</Label>
+                  <Input id="first_name" name="first_name" required />
+                </div>
+                <div>
+                  <Label htmlFor="last_name">Last name</Label>
+                  <Input id="last_name" name="last_name" required />
+                </div>
+              </div>
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" name="email" type="email" required />

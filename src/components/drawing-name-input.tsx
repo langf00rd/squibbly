@@ -9,7 +9,7 @@ export default function DrawingNameInput() {
       {/* {JSON.stringify(currentDrawingDetails?.id)} */}
       <input
         type="text"
-        placeholder="Untitled Drawing"
+        placeholder="Untitled Artifact"
         defaultValue={
           currentDrawingDetails
             ? currentDrawingDetails?.title
