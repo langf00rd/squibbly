@@ -2,28 +2,25 @@ import DrawingCanvas from "@/components/canvas";
 import DrawingNameInput from "@/components/drawing-name-input";
 import NewButton from "@/components/new-button";
 import SaveButton from "@/components/save-button";
-import SavedDrawingsButton from "@/components/saved-drawings-button";
+import More from "@/components/more";
 import ToolSelector from "@/components/tool-selector";
 import Toolbar from "@/components/toolbar";
-import { Geist_Mono } from "next/font/google";
+import type { Metadata } from "next";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export const metadata: Metadata = {
+  title: "squibble canvas",
+};
 
-export default function Home() {
+export default function Page() {
   return (
-    <main
-      className={`h-screen w-screen overflow-hidden ${geistMono.className}`}
-    >
+    <main className="h-screen w-screen overflow-hidden">
       <DrawingCanvas />
       <div className="absolute p-3 flex top-0 left-0 right-0 justify-between items-center">
         <DrawingNameInput />
         <div className="flex gap-3">
           <NewButton />
           <SaveButton />
-          <SavedDrawingsButton />
+          <More />
         </div>
       </div>
       <div className="absolute p-3 flex bottom-0 left-0 right-0 justify-between items-center">

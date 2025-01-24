@@ -6,21 +6,32 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useDrawingContext } from "@/lib/contexts/drawing-context";
-import { MenuIcon } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import type React from "react";
 import { Button } from "./ui/button";
+import { signOut } from "@/app/auth/actions";
 
-export default function SavedDrawingsButton() {
+export default function More() {
   const { savedDrawings, loadDrawing, currentDrawingDetails } =
     useDrawingContext();
+
+  async function handleSignOut() {
+    await signOut();
+    window.location.reload();
+  }
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button size="icon" variant="secondary">
-          <MenuIcon />
+          <MoreVertical />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="m-3 max-h-[500px] overflow-scroll">
+      <PopoverContent className="m-3 space-y-5 max-h-[500px] overflow-scroll">
+        <Button size="sm" className="w-full" onClick={handleSignOut}>
+          Sign Out
+        </Button>
+        <hr />
         <div className="space-y-3">
           <p className="font-semibold">Your saved squibbles</p>
           {savedDrawings.length < 1 && (
