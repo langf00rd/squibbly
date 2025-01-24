@@ -40,7 +40,7 @@ export default function More() {
           <ul className="space-y-3">
             {savedDrawings.map((drawing) => (
               <li
-                key={drawing.created}
+                key={drawing.id}
                 className="flex items-center gap-1"
                 role="button"
                 onClick={() => loadDrawing(drawing.id)}
@@ -53,7 +53,7 @@ export default function More() {
                         : "",
                   }}
                 >
-                  {drawing.title}
+                  {drawing.title} #{drawing.id}
                 </p>
               </li>
             ))}

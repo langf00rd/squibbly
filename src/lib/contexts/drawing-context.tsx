@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  createDrawing,
+  getUserArtifacts,
+  updateArtifcat,
+} from "@/app/(dashboard)/actions";
 import type React from "react";
 import {
   createContext,
@@ -9,7 +14,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { COOKIE_KEYS, Drawing, DrawingContextType, Stroke } from "../generics";
+import { COOKIE_KEYS, Artifact, DrawingContextType, Stroke } from "../generics";
 import { toast } from "../hooks/use-toast";
 const DrawingContext = createContext<DrawingContextType | undefined>(undefined);
 
@@ -20,8 +25,8 @@ export function DrawingProvider(props: { children: ReactNode }) {
   const [tool, setTool] = useState<"pencil" | "eraser">("pencil");
   const [currentDrawing, setCurrentDrawing] = useState<Stroke[]>([]);
   const [currentDrawingDetails, setCurrentDrawingDetails] =
-    useState<Drawing | null>(null);
-  const [savedDrawings, setSavedDrawings] = useState<Drawing[]>([]);
+    useState<Artifact | null>(null);
+  const [savedDrawings, setSavedDrawings] = useState<Artifact[]>([]);
   const [undoStack, setUndoStack] = useState<Stroke[][]>([]);
   const [redoStack, setRedoStack] = useState<Stroke[][]>([]);
 
@@ -56,55 +61,71 @@ export function DrawingProvider(props: { children: ReactNode }) {
     localStorage.setItem(key, value);
   }
 
+  async function handleUpdateArtifact(drawing: Artifact["data"]) {
+    if (!currentDrawingDetails) {
+      return toast({
+        title: "Error",
+        description: "No drawing to update",
+      });
+    }
+
+    try {
+      const payload = {
+        ...currentDrawingDetails,
+        data: drawing,
+      };
+
+      await updateArtifcat(payload);
+
+      const updatedDrawings = savedDrawings.map((d) =>
+        d.id === currentDrawingDetails?.id ? { ...d, data: drawing } : d,
+      );
+
+      setSavedDrawings(updatedDrawings);
+      saveToLocalStorage(COOKIE_KEYS.drawing, JSON.stringify(updatedDrawings));
+    } catch (err) {
+      return toast({
+        description: String(err),
+      });
+    }
+  }
+
+  async function handleCreateArtifact(drawing: Stroke[]) {
+    const newDrawing = {
+      data: drawing,
+      title: `squibble #${savedDrawings.length + 1}`,
+    };
+    try {
+      const _drawings = await createDrawing(newDrawing);
+      setCurrentDrawing(_drawings[0].data);
+      setCurrentDrawingDetails(_drawings[0]);
+      saveToLocalStorage(COOKIE_KEYS.drawing, JSON.stringify([newDrawing]));
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: String(err),
+      });
+    }
+  }
+
   const addSavedDrawing = useCallback(
     (drawing: Stroke[]) => {
-      if (!currentDrawingDetails) {
-        const newDrawing = {
-          data: drawing,
-          created: new Date().toISOString(),
-          title: `squibble #1`,
-          id: `SQUIBBLE-1-${Date.now()}`,
-        };
-        setCurrentDrawingDetails(newDrawing);
-        saveToLocalStorage(COOKIE_KEYS.drawing, JSON.stringify([newDrawing]));
-        return toast({
-          title: "Great.",
-          description: "Your first drawing is saved",
-        });
-      }
-
       const savedDrawingsIDs = savedDrawings.map((d) => d.id);
 
-      if (savedDrawingsIDs.includes(currentDrawingDetails?.id)) {
-        const updatedDrawings = savedDrawings.map((d) =>
-          d.id === currentDrawingDetails.id ? { ...d, data: drawing } : d,
-        );
-        setSavedDrawings(updatedDrawings);
-        saveToLocalStorage(
-          COOKIE_KEYS.drawing,
-          JSON.stringify(updatedDrawings),
-        );
-      } else {
-        const thisDrawing = {
-          ...currentDrawingDetails,
-          data: drawing,
-        };
-        setSavedDrawings((prev) => [...prev, thisDrawing]);
-        saveToLocalStorage(
-          COOKIE_KEYS.drawing,
-          JSON.stringify([...savedDrawings, thisDrawing]),
-        );
-      }
+      if (!currentDrawingDetails || !savedDrawingsIDs)
+        handleCreateArtifact(drawing);
+      else handleUpdateArtifact(drawing);
+
       toast({
         title: "🎉 Awesome",
-        description: "Drawing has been saved successfully",
+        description: "Your squibble has been saved",
       });
     },
     [currentDrawingDetails, savedDrawings],
   );
 
   const loadDrawing = useCallback(
-    (id: string) => {
+    (id: Artifact["id"]) => {
       const drawingToLoad = savedDrawings.find((a) => a.id === id);
       if (!drawingToLoad) return;
       setCurrentDrawing(drawingToLoad.data);
@@ -125,37 +146,18 @@ export function DrawingProvider(props: { children: ReactNode }) {
     }
   }
 
-  function createDrawingObject(data?: Drawing) {
-    return {
-      ...data,
-      created: new Date().toISOString(),
-      title: data?.title ?? `squibble #${savedDrawings.length + 1}`,
-      data: data?.data ?? currentDrawing,
-      id: data?.id ?? `SQUIBBLE-${savedDrawings.length + 1}-${Date.now()}`,
-    };
-  }
-
   function createNewDrawing() {
-    const newDrawing = createDrawingObject();
     setCurrentDrawing([]);
-    setCurrentDrawingDetails(newDrawing);
+    setCurrentDrawingDetails(null);
     setUndoStack([]);
     setRedoStack([]);
   }
 
   useEffect(() => {
-    // fetch saved drawing from local storage and set to state
-    const storedDrawings = localStorage.getItem(COOKIE_KEYS.drawing);
-    if (storedDrawings) {
-      const parsedStoredDrawings: Drawing[] = JSON.parse(storedDrawings);
-      setSavedDrawings(parsedStoredDrawings);
-      setCurrentDrawingDetails(
-        parsedStoredDrawings[parsedStoredDrawings.length - 1],
-      );
-      setCurrentDrawing(
-        parsedStoredDrawings[parsedStoredDrawings.length - 1].data,
-      );
-    }
+    (async () => {
+      const artifacts = await getUserArtifacts();
+      setSavedDrawings(artifacts);
+    })();
   }, []);
 
   return (
