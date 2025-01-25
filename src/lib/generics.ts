@@ -1,7 +1,8 @@
 export interface User {
   id: number;
   email: string;
-  created_at: string;
+  first_name: string;
+  last_name: string;
 }
 
 export type Stroke = {
@@ -26,12 +27,12 @@ export interface DrawingContextType {
   tool: "pencil" | "eraser";
   toggleFullScreen: () => void;
   setTool: (tool: "pencil" | "eraser") => void;
-  currentDrawing: Stroke[];
-  setCurrentDrawing: React.Dispatch<React.SetStateAction<Stroke[]>>;
-  setCurrentDrawingDetails: React.Dispatch<
+  currentArtifactData: Stroke[];
+  setCurrentArtifact: React.Dispatch<React.SetStateAction<Stroke[]>>;
+  setCurrentArtifactDetails: React.Dispatch<
     React.SetStateAction<Artifact | null>
   >;
-  savedDrawings: Artifact[];
+  artifacts: Artifact[];
   addSavedDrawing: (drawing: Stroke[]) => void;
   undoStack: Stroke[][];
   redoStack: Stroke[][];
@@ -39,10 +40,11 @@ export interface DrawingContextType {
   undo: () => void;
   redo: () => void;
   loadDrawing: (index: Artifact["id"]) => void;
-  currentDrawingDetails: Artifact | null;
+  currentArtifactDetails: Artifact | null;
   drawingTitle: string;
   setDrawingTitle: React.Dispatch<React.SetStateAction<string>>;
   createNewDrawing: () => void;
+  fetchDataOnLoad: () => Promise<void>;
 }
 
 export enum COOKIE_KEYS {

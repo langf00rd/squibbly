@@ -2,6 +2,12 @@
 
 import { createClient } from "@/lib/utils/supabase/server";
 
+export async function getUser() {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  return user.data.user;
+}
+
 export async function login(email: string, password: string) {
   const supabase = await createClient();
 

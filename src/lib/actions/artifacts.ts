@@ -3,6 +3,12 @@
 import { Artifact } from "@/lib/generics";
 import { createClient } from "@/lib/utils/supabase/server";
 
+export async function deleteArtifactByID(id: Artifact["id"]) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("artifact").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
 export async function createDrawing(payload: Record<string, unknown>) {
   delete payload.created_at;
   delete payload.id;

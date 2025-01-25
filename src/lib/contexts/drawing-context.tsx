@@ -4,7 +4,7 @@ import {
   createDrawing,
   getUserArtifacts,
   updateArtifcat,
-} from "@/app/(dashboard)/actions";
+} from "@/lib/actions/artifacts";
 import type React from "react";
 import {
   createContext,
@@ -14,55 +14,55 @@ import {
   useEffect,
   useState,
 } from "react";
-import { COOKIE_KEYS, Artifact, DrawingContextType, Stroke } from "../generics";
+import { Artifact, COOKIE_KEYS, DrawingContextType, Stroke } from "../generics";
 import { toast } from "../hooks/use-toast";
 const DrawingContext = createContext<DrawingContextType | undefined>(undefined);
 
 export function DrawingProvider(props: { children: ReactNode }) {
-  const [drawingTitle, setDrawingTitle] = useState("");
   const [color, setColor] = useState("#000000");
   const [brushSize, setBrushSize] = useState(5);
   const [tool, setTool] = useState<"pencil" | "eraser">("pencil");
-  const [currentDrawing, setCurrentDrawing] = useState<Stroke[]>([]);
-  const [currentDrawingDetails, setCurrentDrawingDetails] =
+  const [currentArtifactData, setCurrentArtifact] = useState<Stroke[]>([]);
+  const [currentArtifactDetails, setCurrentArtifactDetails] =
     useState<Artifact | null>(null);
-  const [savedDrawings, setSavedDrawings] = useState<Artifact[]>([]);
+  const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [undoStack, setUndoStack] = useState<Stroke[][]>([]);
   const [redoStack, setRedoStack] = useState<Stroke[][]>([]);
+  const [drawingTitle, setDrawingTitle] = useState("");
 
   const addStroke = useCallback(
     (stroke: Stroke) => {
-      setCurrentDrawing((prev) => [...prev, stroke]);
-      setUndoStack((prev) => [...prev, currentDrawing]);
+      setCurrentArtifact((prev) => [...prev, stroke]);
+      setUndoStack((prev) => [...prev, currentArtifactData]);
       setRedoStack([]);
     },
-    [currentDrawing],
+    [currentArtifactData],
   );
 
   const undo = useCallback(() => {
     if (undoStack.length > 0) {
       const prevDrawing = undoStack.pop()!;
-      setRedoStack((prev) => [...prev, currentDrawing]);
-      setCurrentDrawing(prevDrawing);
+      setRedoStack((prev) => [...prev, currentArtifactData]);
+      setCurrentArtifact(prevDrawing);
       setUndoStack([...undoStack]);
     }
-  }, [currentDrawing, undoStack]);
+  }, [currentArtifactData, undoStack]);
 
   const redo = useCallback(() => {
     if (redoStack.length > 0) {
       const nextDrawing = redoStack.pop()!;
-      setUndoStack((prev) => [...prev, currentDrawing]);
-      setCurrentDrawing(nextDrawing);
+      setUndoStack((prev) => [...prev, currentArtifactData]);
+      setCurrentArtifact(nextDrawing);
       setRedoStack([...redoStack]);
     }
-  }, [currentDrawing, redoStack]);
+  }, [currentArtifactData, redoStack]);
 
   function saveToLocalStorage(key: COOKIE_KEYS, value: string) {
     localStorage.setItem(key, value);
   }
 
   async function handleUpdateArtifact(drawing: Artifact["data"]) {
-    if (!currentDrawingDetails) {
+    if (!currentArtifactDetails) {
       return toast({
         title: "Error",
         description: "No drawing to update",
@@ -71,17 +71,18 @@ export function DrawingProvider(props: { children: ReactNode }) {
 
     try {
       const payload = {
-        ...currentDrawingDetails,
+        ...currentArtifactDetails,
+        title: drawingTitle || `squibble #${artifacts.length + 1}`,
         data: drawing,
       };
 
       await updateArtifcat(payload);
 
-      const updatedDrawings = savedDrawings.map((d) =>
-        d.id === currentDrawingDetails?.id ? { ...d, data: drawing } : d,
+      const updatedDrawings = artifacts.map((d) =>
+        d.id === currentArtifactDetails?.id ? { ...d, data: drawing } : d,
       );
 
-      setSavedDrawings(updatedDrawings);
+      setArtifacts(updatedDrawings);
       saveToLocalStorage(COOKIE_KEYS.drawing, JSON.stringify(updatedDrawings));
     } catch (err) {
       return toast({
@@ -90,16 +91,16 @@ export function DrawingProvider(props: { children: ReactNode }) {
     }
   }
 
-  async function handleCreateArtifact(drawing: Stroke[]) {
-    const newDrawing = {
-      data: drawing,
-      title: `squibble #${savedDrawings.length + 1}`,
+  async function handleCreateArtifact(data: Stroke[]) {
+    const newArtifact = {
+      title: drawingTitle || `squibble #${artifacts.length + 1}`,
+      data,
     };
     try {
-      const _drawings = await createDrawing(newDrawing);
-      setCurrentDrawing(_drawings[0].data);
-      setCurrentDrawingDetails(_drawings[0]);
-      saveToLocalStorage(COOKIE_KEYS.drawing, JSON.stringify([newDrawing]));
+      const artifactsInDb = await createDrawing(newArtifact);
+      setCurrentArtifact(artifactsInDb[0].data);
+      setCurrentArtifactDetails(artifactsInDb[0]);
+      saveToLocalStorage(COOKIE_KEYS.drawing, JSON.stringify([newArtifact]));
     } catch (err) {
       toast({
         title: "Error",
@@ -109,31 +110,33 @@ export function DrawingProvider(props: { children: ReactNode }) {
   }
 
   const addSavedDrawing = useCallback(
-    (drawing: Stroke[]) => {
-      const savedDrawingsIDs = savedDrawings.map((d) => d.id);
+    async (drawing: Stroke[]) => {
+      const artifactsIDs = artifacts.map((d) => d.id);
 
-      if (!currentDrawingDetails || !savedDrawingsIDs)
+      if (!currentArtifactDetails || !artifactsIDs)
         handleCreateArtifact(drawing);
       else handleUpdateArtifact(drawing);
+
+      await fetchDataOnLoad();
 
       toast({
         title: "🎉 Awesome",
         description: "Your squibble has been saved",
       });
     },
-    [currentDrawingDetails, savedDrawings],
+    [currentArtifactDetails, artifacts, artifacts.length, drawingTitle],
   );
 
   const loadDrawing = useCallback(
     (id: Artifact["id"]) => {
-      const drawingToLoad = savedDrawings.find((a) => a.id === id);
+      const drawingToLoad = artifacts.find((a) => a.id === id);
       if (!drawingToLoad) return;
-      setCurrentDrawing(drawingToLoad.data);
-      setCurrentDrawingDetails(drawingToLoad);
+      setCurrentArtifact(drawingToLoad.data);
+      setCurrentArtifactDetails(drawingToLoad);
       setUndoStack([]);
       setRedoStack([]);
     },
-    [savedDrawings],
+    [artifacts],
   );
 
   function toggleFullScreen() {
@@ -147,17 +150,19 @@ export function DrawingProvider(props: { children: ReactNode }) {
   }
 
   function createNewDrawing() {
-    setCurrentDrawing([]);
-    setCurrentDrawingDetails(null);
+    setCurrentArtifact([]);
+    setCurrentArtifactDetails(null);
     setUndoStack([]);
     setRedoStack([]);
   }
 
+  async function fetchDataOnLoad() {
+    const artifacts = await getUserArtifacts();
+    setArtifacts(artifacts);
+  }
+
   useEffect(() => {
-    (async () => {
-      const artifacts = await getUserArtifacts();
-      setSavedDrawings(artifacts);
-    })();
+    fetchDataOnLoad();
   }, []);
 
   return (
@@ -169,9 +174,9 @@ export function DrawingProvider(props: { children: ReactNode }) {
         setBrushSize,
         tool,
         setTool,
-        currentDrawing,
-        setCurrentDrawing,
-        savedDrawings,
+        currentArtifactData,
+        setCurrentArtifact,
+        artifacts,
         addSavedDrawing,
         undoStack,
         redoStack,
@@ -180,11 +185,12 @@ export function DrawingProvider(props: { children: ReactNode }) {
         redo,
         loadDrawing,
         toggleFullScreen,
-        currentDrawingDetails,
-        setCurrentDrawingDetails,
+        currentArtifactDetails,
+        setCurrentArtifactDetails,
         drawingTitle,
         setDrawingTitle,
         createNewDrawing,
+        fetchDataOnLoad,
       }}
     >
       {props.children}

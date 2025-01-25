@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ROUTES } from "@/lib/constants";
 import Link from "next/link";
-import { signup } from "../actions";
+import { signup } from "../../../lib/actions/auth";
 import { toast } from "@/lib/hooks/use-toast";
 import { useState } from "react";
 

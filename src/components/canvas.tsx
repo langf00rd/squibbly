@@ -11,7 +11,7 @@ const SCALE_FACTOR = 2;
 export default function DrawingCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { color, brushSize, tool, currentDrawing, addStroke } =
+  const { color, brushSize, tool, currentArtifactData, addStroke } =
     useDrawingContext();
   const [isDrawing, setIsDrawing] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -31,7 +31,7 @@ export default function DrawingCanvas() {
 
   useEffect(() => {
     drawStrokes();
-  }, [currentDrawing, offset]);
+  }, [currentArtifactData, offset]);
 
   function drawStrokes() {
     const canvas = canvasRef.current;
@@ -40,7 +40,7 @@ export default function DrawingCanvas() {
 
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    currentDrawing.forEach((stroke) => {
+    currentArtifactData.forEach((stroke) => {
       ctx.beginPath();
       ctx.strokeStyle = stroke.color;
       ctx.lineWidth = stroke.brushSize / SCALE_FACTOR;

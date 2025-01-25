@@ -6,9 +6,12 @@ import { useDrawingContext } from "@/lib/contexts/drawing-context";
 import { Button } from "./ui/button";
 
 export default function SaveButton() {
-  const { currentDrawing, addSavedDrawing } = useDrawingContext();
+  const { currentArtifactData, addSavedDrawing } = useDrawingContext();
   return (
-    <Button onClick={() => addSavedDrawing(currentDrawing)} variant="secondary">
+    <Button
+      onClick={() => addSavedDrawing(currentArtifactData)}
+      variant="secondary"
+    >
       <Save size={20} />
       Save
     </Button>

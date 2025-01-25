@@ -1,5 +1,5 @@
 import DrawingCanvas from "@/components/canvas";
-import DrawingNameInput from "@/components/drawing-name-input";
+import ArtifactNameInput from "@/components/artifact-name";
 import NewButton from "@/components/new-button";
 import SaveButton from "@/components/save-button";
 import More from "@/components/more";
@@ -16,7 +16,7 @@ export default function Page() {
     <main className="h-screen w-screen overflow-hidden">
       <DrawingCanvas />
       <div className="absolute p-3 flex top-0 left-0 right-0 justify-between items-center">
-        <DrawingNameInput />
+        <ArtifactNameInput />
         <div className="flex gap-3">
           <NewButton />
           <SaveButton />
