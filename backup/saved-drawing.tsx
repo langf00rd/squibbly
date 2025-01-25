@@ -4,12 +4,12 @@
 // import { useDrawingContext } from "@/lib/contexts/drawing-context";
 
 // const SavedDrawings: React.FC = () => {
-//   const { savedDrawings, loadDrawing } = useDrawingContext();
+//   const { artifacts, loadDrawing } = useDrawingContext();
 //   return (
 //     <div className="mt-8">
 //       <h2 className="text-2xl font-bold mb-4">Saved Drawings</h2>
 //       <div className="grid grid-cols-3 gap-4">
-//         {savedDrawings.map((drawing, index) => (
+//         {artifacts.map((drawing, index) => (
 //           <button
 //             key={index}
 //             onClick={() => loadDrawing(index)}

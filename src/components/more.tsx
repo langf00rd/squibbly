@@ -5,20 +5,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useDrawingContext } from "@/lib/contexts/drawing-context";
+import useAuth from "@/lib/hooks/use-auth";
 import { MoreVertical } from "lucide-react";
 import type React from "react";
+import ArtifactsList from "./artifacts-list";
 import { Button } from "./ui/button";
-import { signOut } from "@/app/auth/actions";
 
 export default function More() {
-  const { savedDrawings, loadDrawing, currentDrawingDetails } =
-    useDrawingContext();
-
-  async function handleSignOut() {
-    await signOut();
-    window.location.reload();
-  }
+  const { user, signUserOut, isSigningOut } = useAuth();
 
   return (
     <Popover>
@@ -28,37 +22,22 @@ export default function More() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="m-3 space-y-5 max-h-[500px] overflow-scroll">
-        <Button size="sm" className="w-full" onClick={handleSignOut}>
+        <p className="text-sm">
+          <span className="font-semibold">
+            {user?.first_name} {user?.last_name}
+          </span>{" "}
+          <br /> {user?.email}
+        </p>
+        <Button
+          size="sm"
+          className="w-full"
+          isLoading={isSigningOut}
+          onClick={signUserOut}
+        >
           Sign Out
         </Button>
         <hr />
-        <div className="space-y-3">
-          <p className="font-semibold">Your saved squibbles</p>
-          {savedDrawings.length < 1 && (
-            <p className="text-sm">No saved squibbles yet :(</p>
-          )}
-          <ul className="space-y-3">
-            {savedDrawings.map((drawing) => (
-              <li
-                key={drawing.id}
-                className="flex items-center gap-1"
-                role="button"
-                onClick={() => loadDrawing(drawing.id)}
-              >
-                <p
-                  style={{
-                    color:
-                      currentDrawingDetails?.id === drawing.id
-                        ? "var(--primary)"
-                        : "",
-                  }}
-                >
-                  {drawing.title} #{drawing.id}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ArtifactsList />
       </PopoverContent>
     </Popover>
   );
