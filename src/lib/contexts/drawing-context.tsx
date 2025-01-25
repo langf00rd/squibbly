@@ -19,7 +19,6 @@ import { toast } from "../hooks/use-toast";
 const DrawingContext = createContext<DrawingContextType | undefined>(undefined);
 
 export function DrawingProvider(props: { children: ReactNode }) {
-  const [drawingTitle, setDrawingTitle] = useState("");
   const [color, setColor] = useState("#000000");
   const [brushSize, setBrushSize] = useState(5);
   const [tool, setTool] = useState<"pencil" | "eraser">("pencil");
@@ -29,6 +28,7 @@ export function DrawingProvider(props: { children: ReactNode }) {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [undoStack, setUndoStack] = useState<Stroke[][]>([]);
   const [redoStack, setRedoStack] = useState<Stroke[][]>([]);
+  const [drawingTitle, setDrawingTitle] = useState("");
 
   const addStroke = useCallback(
     (stroke: Stroke) => {
@@ -72,7 +72,7 @@ export function DrawingProvider(props: { children: ReactNode }) {
     try {
       const payload = {
         ...currentArtifactDetails,
-        title: drawingTitle,
+        title: drawingTitle || `squibble #${artifacts.length + 1}`,
         data: drawing,
       };
 
@@ -93,7 +93,7 @@ export function DrawingProvider(props: { children: ReactNode }) {
 
   async function handleCreateArtifact(data: Stroke[]) {
     const newArtifact = {
-      title: drawingTitle,
+      title: drawingTitle || `squibble #${artifacts.length + 1}`,
       data,
     };
     try {
@@ -110,19 +110,21 @@ export function DrawingProvider(props: { children: ReactNode }) {
   }
 
   const addSavedDrawing = useCallback(
-    (drawing: Stroke[]) => {
+    async (drawing: Stroke[]) => {
       const artifactsIDs = artifacts.map((d) => d.id);
 
       if (!currentArtifactDetails || !artifactsIDs)
         handleCreateArtifact(drawing);
       else handleUpdateArtifact(drawing);
 
+      await fetchDataOnLoad();
+
       toast({
         title: "🎉 Awesome",
         description: "Your squibble has been saved",
       });
     },
-    [currentArtifactDetails, artifacts, drawingTitle],
+    [currentArtifactDetails, artifacts, artifacts.length, drawingTitle],
   );
 
   const loadDrawing = useCallback(
@@ -154,11 +156,13 @@ export function DrawingProvider(props: { children: ReactNode }) {
     setRedoStack([]);
   }
 
+  async function fetchDataOnLoad() {
+    const artifacts = await getUserArtifacts();
+    setArtifacts(artifacts);
+  }
+
   useEffect(() => {
-    (async () => {
-      const artifacts = await getUserArtifacts();
-      setArtifacts(artifacts);
-    })();
+    fetchDataOnLoad();
   }, []);
 
   return (
@@ -186,6 +190,7 @@ export function DrawingProvider(props: { children: ReactNode }) {
         drawingTitle,
         setDrawingTitle,
         createNewDrawing,
+        fetchDataOnLoad,
       }}
     >
       {props.children}
