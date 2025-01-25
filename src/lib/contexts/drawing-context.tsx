@@ -19,6 +19,8 @@ import { toast } from "../hooks/use-toast";
 const DrawingContext = createContext<DrawingContextType | undefined>(undefined);
 
 export function DrawingProvider(props: { children: ReactNode }) {
+  const [isSaving, setIsSaving] =
+    useState<DrawingContextType["isSaving"]>(false);
   const [color, setColor] = useState("#000000");
   const [brushSize, setBrushSize] = useState(5);
   const [tool, setTool] = useState<"pencil" | "eraser">("pencil");
@@ -113,11 +115,15 @@ export function DrawingProvider(props: { children: ReactNode }) {
     async (drawing: Stroke[]) => {
       const artifactsIDs = artifacts.map((d) => d.id);
 
+      setIsSaving(true);
+
       if (!currentArtifactDetails || !artifactsIDs)
-        handleCreateArtifact(drawing);
-      else handleUpdateArtifact(drawing);
+        await handleCreateArtifact(drawing);
+      else await handleUpdateArtifact(drawing);
 
       await fetchDataOnLoad();
+
+      setIsSaving(false);
 
       toast({
         title: "🎉 Awesome",
@@ -191,6 +197,7 @@ export function DrawingProvider(props: { children: ReactNode }) {
         setDrawingTitle,
         createNewDrawing,
         fetchDataOnLoad,
+        isSaving,
       }}
     >
       {props.children}
