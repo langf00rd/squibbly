@@ -9,10 +9,10 @@ export default function NewButton() {
   return (
     <Button
       size="icon"
-      className="bg-white border text-primary"
+      className="bg-white p-0 text-primary"
       onClick={createNewDrawing}
     >
-      <PlusIcon size={20} />
+      <PlusIcon size={30} />
     </Button>
   );
 }

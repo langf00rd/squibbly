@@ -45,6 +45,7 @@ export interface DrawingContextType {
   setDrawingTitle: React.Dispatch<React.SetStateAction<string>>;
   createNewDrawing: () => void;
   fetchDataOnLoad: () => Promise<void>;
+  isSaving: boolean;
 }
 
 export enum COOKIE_KEYS {
