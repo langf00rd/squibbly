@@ -41,6 +41,20 @@ export default function Toolbar() {
         className="w-32"
       /> */}
       <div className="flex space-x-2">
+        <Button
+          size="icon"
+          onClick={undo}
+          className="text-black bg-white border shadow-md hover:bg-gray-300"
+        >
+          <Undo2 size={20} />
+        </Button>
+        <Button
+          size="icon"
+          onClick={redo}
+          className="text-black bg-white border shadow-md hover:bg-gray-300"
+        >
+          <Redo2 size={20} />
+        </Button>
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -73,24 +87,16 @@ export default function Toolbar() {
                     onClick={() => setColor(c)}
                   />
                 ))}
+                <Input
+                  className="size-6 p-0 rounded-full"
+                  type="color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                />
               </div>
             </div>
           </PopoverContent>
         </Popover>
-        <Button
-          size="icon"
-          onClick={undo}
-          className="text-black bg-white border shadow-md hover:bg-gray-300"
-        >
-          <Undo2 size={20} />
-        </Button>
-        <Button
-          size="icon"
-          onClick={redo}
-          className="text-black bg-white border shadow-md hover:bg-gray-300"
-        >
-          <Redo2 size={20} />
-        </Button>
       </div>
     </div>
   );

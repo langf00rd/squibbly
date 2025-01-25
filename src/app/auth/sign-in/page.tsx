@@ -40,7 +40,7 @@ export default function LoginPage() {
   return (
     <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#fff9ee]">
       <div className="flex flex-col gap-6">
-        <Card className="rounded-3xl w-[400px]">
+        <Card className="w-[400px]">
           <CardHeader>
             <CardTitle className="text-2xl">Get ready to squibble 🐶</CardTitle>
             <CardDescription>
