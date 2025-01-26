@@ -67,7 +67,7 @@ export function DrawingProvider(props: { children: ReactNode }) {
     if (!currentArtifactDetails) {
       return toast({
         title: "Error",
-        description: "No drawing to update",
+        description: "No squible to update",
       });
     }
 
